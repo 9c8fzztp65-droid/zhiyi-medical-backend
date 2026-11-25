@@ -1,11 +1,11 @@
 import os
 from typing import Any, Literal
-import httpx
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-APP_API_TOKEN = os.getenv("APP_API_TOKEN", "")
+bearer_scheme = HTTPBearer(auto_error=False)APP_API_TOKEN = os.getenv("APP_API_TOKEN", "")
 # Provider credentials are server-side only. Never ship these values in the iOS app.
 DEFAULT_PROVIDER = os.getenv("DEFAULT_PROVIDER", "deepseek").lower()
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
@@ -89,7 +89,14 @@ def check_app_token(authorization: str | None):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 @app.post("/api/v1/clinical/assist")
-async def clinical_assist(payload: ClinicalRequest, authorization: str | None = Header(default=None)):
+async def clinical_assist(
+    payload: ClinicalRequest,
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme)
+):
+    authorization = (
+        f"{credentials.scheme} {credentials.credentials}"
+        if credentials else None
+    )
     check_app_token(authorization)
     provider = payload.provider or DEFAULT_PROVIDER
     base_url, api_key, model_name = provider_config(provider)
