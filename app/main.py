@@ -5,7 +5,9 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-bearer_scheme = HTTPBearer(auto_error=False)APP_API_TOKEN = os.getenv("APP_API_TOKEN", "")
+bearer_scheme = HTTPBearer(auto_error=False)
+
+APP_API_TOKEN = os.getenv("APP_API_TOKEN", "")
 # Provider credentials are server-side only. Never ship these values in the iOS app.
 DEFAULT_PROVIDER = os.getenv("DEFAULT_PROVIDER", "deepseek").lower()
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
