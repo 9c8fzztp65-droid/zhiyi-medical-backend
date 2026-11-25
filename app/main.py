@@ -1,4 +1,5 @@
 import os
+import httpx
 from typing import Any, Literal
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
